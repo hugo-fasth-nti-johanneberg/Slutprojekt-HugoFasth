@@ -99,3 +99,11 @@ end
 
 ##DOKUMENTERA NÄSTA GÅNGq
 
+get('/food') do
+    
+    food_items = db.execute("SELECT foodId, foodTitle, Votes FROM foodtable")
+
+    p food_items
+
+    slim(:food)
+end
