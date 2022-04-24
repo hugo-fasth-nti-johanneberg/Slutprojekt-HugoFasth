@@ -6,6 +6,7 @@
             .title 
                 Lable Food: 
                 span = food_items["foodTitle"]
-            button.votes
-                Lable Vote! 
-                span = food_items["Votes"]
+                
+            form action="/foodvotes/#{food_items["foodId"]}" method="POST" 
+                input.votes type="submit" value="rösta! #{food_items["Votes"]}"
+                    

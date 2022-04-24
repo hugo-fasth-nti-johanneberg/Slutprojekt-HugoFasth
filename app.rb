@@ -2,29 +2,76 @@ require 'sinatra'
 require 'sqlite3'
 require 'slim'
 require 'bcrypt'
+enable :sessions
 
 get('/') do
-    slim(:start)
+    user_id = session[:user_id]
+    db = SQLite3::Database.new("db/dbSlutprojekt.db")
+    db.results_as_hash = true
+
+    usernamedisplay = db.execute("SELECT username FROM users WHERE userid = ?", user_id).first
+    if usernamedisplay != nil
+        usernamedisplay = usernamedisplay["username"]
+    end
+
+    slim(:start,locals:{usernamedisplay:usernamedisplay})
 end
 
 get('/error') do 
-    slim(:error)
+
+    user_id = session[:user_id]
+    db = SQLite3::Database.new("db/dbSlutprojekt.db")
+    db.results_as_hash = true
+    usernamedisplay = db.execute("SELECT username FROM users WHERE userid = ?", user_id).first
+    if usernamedisplay != nil
+        usernamedisplay = usernamedisplay["username"]
+    end
+    slim(:error,locals:{usernamedisplay:usernamedisplay})
 end
 
 get('/register') do 
-    slim(:register)
-    
 
+    user_id = session[:user_id]
+    db = SQLite3::Database.new("db/dbSlutprojekt.db")
+    db.results_as_hash = true
+    usernamedisplay = db.execute("SELECT username FROM users WHERE userid = ?", user_id).first
+    if usernamedisplay != nil
+        usernamedisplay = usernamedisplay["username"]
+    end
+    slim(:register,locals:{usernamedisplay:usernamedisplay})
 
 end
+get '/login' do 
+
+    user_id = session[:user_id]
+    db = SQLite3::Database.new("db/dbSlutprojekt.db")
+    db.results_as_hash = true
+    usernamedisplay = db.execute("SELECT username FROM users WHERE userid = ?", user_id).first
+    if usernamedisplay != nil
+        usernamedisplay = usernamedisplay["username"]
+    end
+    slim(:login,locals:{usernamedisplay:usernamedisplay})
+end
+
 get '/logout' do
-    "Hello World"
-    slim(:logout)
+
+    session[:user_id] = nil
+    
+    redirect('/')
 end
 
 get('/admin') do
+    user_id = session[:user_id]
     db = SQLite3::Database.new("db/dbSlutprojekt.db")
-    slim(:admin)
+    db.results_as_hash = true
+    usernamedisplay = db.execute("SELECT username FROM users WHERE userid = ?", user_id).first
+    if usernamedisplay != nil
+        usernamedisplay = usernamedisplay["username"]
+    end
+
+
+
+    slim(:admin,locals:{usernamedisplay:usernamedisplay})
 end
 
 
@@ -54,7 +101,7 @@ post ('/users/new') do
 end
 
 
-get '/showlogin' do
+post('/showlogin') do
 
     username = params[:username]
     password = params[:password]
@@ -65,28 +112,23 @@ get '/showlogin' do
     result = db.execute("SELECT userid, password_digest FROM users WHERE username=?", username)
 
     if result.empty?
-        # redirect('/error')
-    end                 #FIXA NÄSTA GÅNG VETTE FAN
+        redirect('/error')
+    end                 
+
+    user_id = result.first["userid"]    
+    password_digest = result.first["password_digest"]
     
-    p result
-    if result.length != 0
-        user_id = result.first["userid"]    
-    end    
-    password_digest = result.first["passowrd_digest"]
-    if BCryt::Password.new(password_digest) == password
+    if BCrypt::Password.new(password_digest) == password
         session[:user_id] = user_id
-        redirect('/lists')
+        redirect('/')
     else
         set_error("Ivalid Credentials")
         redirect('/error')
     end
-    slim(:showlogin)
 end
 
-get '/register_confirmation' do
-    "du är inne"
-    slim(:register_confirmation)
-end
+
+
 
 # def database_connect()
 #     #skapa koppling till databas
@@ -106,13 +148,49 @@ end
 ##DOKUMENTERA NÄSTA GÅNGq
 
 get('/food') do
-    
+    user_id = session[:user_id]
     db = SQLite3::Database.new("db/dbSlutprojekt.db")
     db.results_as_hash = true
     food_items = db.execute("SELECT foodId, foodTitle, Votes FROM foodtable")
     
     
-    p food_items
+    
+    usernamedisplay = db.execute("SELECT username FROM users WHERE userid = ?", user_id).first
+    if usernamedisplay != nil
+        usernamedisplay = usernamedisplay["username"]
+    end
 
-    slim(:food,locals:{foodvariable:food_items})
+    slim(:food,locals:{foodvariable:food_items, usernamedisplay:usernamedisplay})
+    
 end
+
+post('/food/new') do
+    db = SQLite3::Database.new("db/dbSlutprojekt.db")
+    db.results_as_hash = true
+
+    newfood = params[:newfood]
+
+    db.execute("INSERT INTO foodtable(foodTitle, Votes) VALUES (?,0)", newfood)
+    redirect('/food')
+
+end
+
+
+post('/foodvotes/:id') do 
+
+    db = SQLite3::Database.new("db/dbSlutprojekt.db")
+    db.results_as_hash = true
+
+    id = params[:id]
+    result = db.execute("SELECT Votes FROM foodtable WHERE foodId = ?", id).first
+    votes = result["Votes"]
+    p votes
+
+    votes += 1
+    
+    db.execute("UPDATE foodtable SET Votes = ? WHERE foodId = ?", votes, id)
+
+    redirect('/food')
+
+end
+
