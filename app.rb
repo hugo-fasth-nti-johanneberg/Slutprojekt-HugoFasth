@@ -22,6 +22,12 @@ get '/logout' do
     slim(:logout)
 end
 
+get('/admin') do
+    db = SQLite3::Database.new("db/dbSlutprojekt.db")
+    slim(:admin)
+end
+
+
 post ('/users/new') do
     username = params[:username]
     password = params[:password]
@@ -101,9 +107,12 @@ end
 
 get('/food') do
     
+    db = SQLite3::Database.new("db/dbSlutprojekt.db")
+    db.results_as_hash = true
     food_items = db.execute("SELECT foodId, foodTitle, Votes FROM foodtable")
-
+    
+    
     p food_items
 
-    slim(:food)
+    slim(:food,locals:{foodvariable:food_items})
 end

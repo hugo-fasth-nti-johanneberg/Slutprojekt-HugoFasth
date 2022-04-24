@@ -32,6 +32,9 @@ header{
             }
         }
     }
+
+
+
 .wrapper{
     display: flex;
     flex-direction: column;
@@ -44,6 +47,7 @@ header{
 
     main{
         display: flex;
+
         background-color: darkolivegreen;
         height: 100%;
         width: 100vw;
@@ -91,4 +95,84 @@ header{
         // Kanske fixa här så den sitter i början av elementet (till vänster )
     // }
 
+
+}
+
+.input_new_food{
+    margin-top: 4rem;
+}
+article{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 10rem;
+    width: 35rem;
+    background-color: chartreuse;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    margin-bottom: 4rem;
+}
+
+.title{
+    position: absolute;
+    left: 4rem;
+    top: 45%;
+}
+
+.id{
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+
+}
+
+// snagga denna knappen hoppas de e okej
+
+.votes{
+    position: absolute;
+    bottom: 2rem;
+    right: 2rem;
+
+
+    //styling
+  background-color: #fbeee0;
+  border: 2px solid #422800;
+  border-radius: 30px;
+  box-shadow: #422800 4px 4px 0 0;
+  color: #422800;
+  cursor: pointer;
+  display: inline-block;
+  font-weight: 600;
+  font-size: 18px;
+  padding: 0 18px;
+  line-height: 50px;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+
+}
+.votes:hover {
+  background-color: #fff;
+}
+
+.votes:active {
+  box-shadow: #422800 2px 2px 0 0;
+  transform: translate(2px, 2px);
+}
+
+@media (min-width: 768px) {
+  .votes {
+    min-width: 120px;
+    padding: 0 25px;
+  }
+}
+
+
+
+.mainer{
+    display: flex;
+    flex-wrap: wrap ;
 }
